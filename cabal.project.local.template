@@ -1,0 +1,12 @@
+--with-compiler: ghc-9.4.8
+--with-compiler: ghc-9.6.7
+--with-compiler: ghc-9.8.4
+--with-compiler: ghc-9.10.3
+--with-compiler: ghc-9.12.4
+--with-compiler: ghc-9.14.1
+
+--package accelerate-tracy
+  --flags: +tracy-client
+  --flags: +tracy-capture
+  --flags: +tracy-profiler
+  --flags: +tracy

@@ -1,0 +1,5 @@
+# Link `hie.yaml` to this file if you want to use HIE with Cabal.
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:accelerate-tracy"

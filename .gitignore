@@ -1,0 +1,7 @@
+*.yaml.lock
+cabal.project.local
+cabal.project.local~
+dist
+dist-*
+hie.yaml
+.stack-work

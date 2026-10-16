@@ -1,0 +1,193 @@
+cabal-version:      3.0
+name:               accelerate-tracy
+version:            0.1.0.0
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             The Accelerate Team
+maintainer:         Trevor L. McDonell <trevor.mcdonell@gmail.com>
+category:           Accelerate
+build-type:         Custom
+synopsis:           Tracy profiling support for the Accelerate language
+
+description:
+  This package implements support for using the
+  [Tracy profiler](https://github.com/wolfpld/tracy#tracy-profiler) to profile
+  [Accelerate](https://www.acceleratehs.org/) kernels.
+
+  Tracy profiling support is disabled by default.  Use Cabal flags to enable
+  Tracy profiling in Accelerate kernels as well as build Tracy executables:
+
+  * @+tracy-client@ enables Tracy profiling support in Accelerate kernels
+  * @+tracy-capture@ builds the @tracy-capture@ executable (CLI)
+  * @+tracy-profiler@ builds the @tracy-profiler@ executable (GUI)
+  * @+tracy@ is equivalent to setting all of the above flags
+
+  For details, please see the README on GitHub at
+  <https://github.com/AccelerateHS/accelerate-tracy#readme>.
+
+tested-with:
+  GHC ==9.4.8
+   || ==9.6.7
+   || ==9.8.4
+   || ==9.10.3
+   || ==9.12.2
+   || ==9.14.1
+
+extra-source-files:
+  -- installed header
+  cbits/flag-no-tracy/flag_tracy.h
+  cbits/flag-tracy/flag_tracy.h
+  -- vendored licenses
+  cbits/tracy/LICENSE
+  cbits/tracy/public/libbacktrace/LICENSE
+  -- vendored client code
+  cbits/tracy/public/**/*.cpp
+  cbits/tracy/public/**/*.h
+  cbits/tracy/public/**/*.hpp
+  -- vendored executable code
+  cbits/tracy/capture/CMakeLists.txt
+  cbits/tracy/capture/src/**/*.cpp
+  cbits/tracy/cmake/*.cmake
+  cbits/tracy/cmake/*.patch
+  cbits/tracy/getopt/*.c
+  cbits/tracy/getopt/*.h
+  cbits/tracy/profiler/CMakeLists.txt
+  cbits/tracy/profiler/src/**/*.c
+  cbits/tracy/profiler/src/**/*.cpp
+  cbits/tracy/profiler/src/**/*.h
+  cbits/tracy/profiler/src/**/*.hpp
+  cbits/tracy/public/libbacktrace/*.cpp
+  cbits/tracy/public/libbacktrace/*.h
+  cbits/tracy/public/libbacktrace/*.hpp
+  cbits/tracy/server/*.cpp
+  cbits/tracy/server/*.h
+  cbits/tracy/server/*.hpp
+
+extra-doc-files:
+  CHANGELOG.md
+  README.md
+
+custom-setup
+  setup-depends:
+    , base      >= 4.17.2.1 && < 4.23
+    , Cabal     >= 3.8.1    && < 3.18
+    , directory >= 1.3.7.1  && < 1.4
+    , filepath  >= 1.4.2.2  && < 1.6
+
+flag tracy-client
+  manual:           True
+  default:          False
+  description:      Enable Tracy profiling support in Accelerate kernels
+
+flag tracy-capture
+  manual:           True
+  default:          False
+  description:      Build @tracy-capture@ executable
+
+flag tracy-profiler
+  manual:           True
+  default:          False
+  description:      Build @tracy-profiler@ executable
+
+flag tracy
+  manual:           True
+  default:          False
+  description:
+    Enable Tracy profiling and build all executables, equivalent to setting all
+    of the other flags
+
+common lang
+  build-depends:
+    base >= 4.17.2.1 && < 4.23
+
+  default-language: GHC2021
+
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wno-unticked-promoted-constructors
+    -Wredundant-constraints
+    -Wunused-packages
+
+library
+  import:           lang
+  hs-source-dirs:   src
+  exposed-modules:  Data.Array.Accelerate.Tracy
+
+  other-extensions:
+    CApiFFI
+    CPP
+
+  if flag(tracy-client) || flag(tracy)
+    include-dirs:
+      cbits/flag-tracy
+      cbits/tracy/public
+
+    -- Virtual package @system-cxx-std-lib@ is used to link the C++ standard
+    -- library.
+    build-depends:
+      system-cxx-std-lib == 1.0
+
+    ghc-options:
+      -- Option @-Wno-unused-packages@ suppresses the @system-cxx-std-lib@ false
+      -- positive warning in GHC <10.
+      -Wno-unused-packages
+      -- The C macros must be defined using @-optc@ because generated @CApiFFI@
+      -- C code includes the C header.  Using @cc-options@ does not work.
+      -optc-DTRACY_ENABLE
+      -optc-DTRACY_NO_SAMPLING
+
+    cpp-options:
+      -DACCELERATE_TRACY
+
+    cxx-sources:
+      cbits/tracy/public/TracyClient.cpp
+
+    cxx-options:
+      -DTRACY_ENABLE
+      -DTRACY_NO_SAMPLING
+      -std=c++20
+      -Wall
+
+    -- Accelerate backends may use dynamic linking to load compiled kernels that
+    -- directly call Tracy functions.  In that case, these symbols need to be
+    -- available in the global namespace.  @-rdynamic@ implies
+    -- @-Wl,--export-dynamic@, which adds every symbol to the dynamic symbol
+    -- table.  Options @--export-dynamic-symbol=glob@ and
+    -- @--export-dynamic-symbol-list=file@ may be available, but these seem to
+    -- be less portable across compilers.
+    if !os(windows)
+      ld-options:
+        -rdynamic
+
+  else
+    include-dirs:
+      cbits/flag-no-tracy
+
+  -- This header is installed from either @cbits/flag-tracy@ or
+  -- @cbits/flag-no-tracy@, depending on the above conditional.  This provides
+  -- @ACCELERATE_TRACY@ macro support in dependent libraries.
+  install-includes: flag_tracy.h
+
+-- When enabled, a mock executable is built from @Main.hs@, and then Tracy
+-- executable @tracy-capture@ is built from C++ sources in a post-build hook.
+-- This makes it possible to build and run the foreign executable via Cabal.
+executable tracy-capture
+  import:           lang
+  hs-source-dirs:   app
+  main-is:          Main.hs
+
+  if !flag(tracy-capture) && !flag(tracy)
+    buildable:      False
+
+-- When enabled, a mock executable is built from @Main.hs@, and then Tracy
+-- executable @tracy-profiler@ is built from C++ sources in a post-build hook.
+-- This makes it possible to build and run the foreign executable via Cabal.
+executable tracy-profiler
+  import:           lang
+  hs-source-dirs:   app
+  main-is:          Main.hs
+
+  if !flag(tracy-profiler) && !flag(tracy)
+    buildable:      False

@@ -1,0 +1,11 @@
+resolver: lts-21.25
+
+packages:
+  - .
+
+#flags:
+  #accelerate-tracy:
+    #tracy-client: true
+    #tracy-capture: true
+    #tracy-profiler: true
+    #tracy: true

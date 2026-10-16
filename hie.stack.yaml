@@ -1,0 +1,5 @@
+# Link `hie.yaml` to this file if you want to use HIE with Stack.
+cradle:
+  stack:
+    - path: "src"
+      component: "accelerate-tracy:lib"

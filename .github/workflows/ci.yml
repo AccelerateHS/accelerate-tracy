@@ -1,0 +1,247 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  cabal:
+    name: "Cabal: GHC ${{ matrix.ghc }} on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          # - macOS-latest    # See https://github.com/AccelerateHS/accelerate-tracy/issues/1
+          # - windows-latest  # See https://github.com/AccelerateHS/accelerate-tracy/issues/2
+        ghc:
+          - 9.4.8
+          - 9.14.1
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: "Install system dependencies (Linux)"
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            libfreetype-dev \
+            libglfw3-dev \
+            libgtk-3-dev \
+            libtbb-dev \
+            pkg-config
+
+      - name: "Install system dependencies (macOS)"
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew install \
+            cmake \
+            freetype \
+            glfw \
+            pkg-config
+
+      - name: "Setup Haskell"
+        id: setup-haskell
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: latest
+          cabal-update: false
+
+      - name: "Update Cabal"
+        run: cabal update
+
+      - name: "Setup Cabal options"
+        run: |
+          cabal_project="cabal-${{ matrix.ghc }}.project"
+          CABAL_OPTS=""
+          if [ -f "${cabal_project}" ] ; then
+            CABAL_OPTS="--project-file=${cabal_project}"
+          fi
+          echo "CABAL_OPTS=${CABAL_OPTS}" | tee -a "${GITHUB_ENV}"
+
+      - name: "Configure (+tracy)"
+        run: |
+          cabal configure $CABAL_OPTS -f+tracy
+          cabal build all --dry-run $CABAL_OPTS -f+tracy
+
+      - name: "Compute cache keys"
+        id: keys
+        run: |
+          ts_yyyymm="$(date +%Y%m)"
+          prefix="${{ runner.os }}-${{ runner.arch }}-${ts_yyyymm}-ghc-${{ matrix.ghc }}-cabal-${{ steps.setup-haskell.outputs.cabal-version }}"
+          plan="${{ hashFiles('**/plan.json') }}"
+          echo "store-prefix=${prefix}-store-" >> "$GITHUB_OUTPUT"
+          echo "store=${prefix}-store-${plan}" >> "$GITHUB_OUTPUT"
+
+      - name: "Restore cache"
+        id: restore-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ steps.setup-haskell.outputs.cabal-store }}
+          key: ${{ steps.keys.outputs.store }}
+          restore-keys: ${{ steps.keys.outputs.store-prefix }}
+
+      - name: "Build dependencies (+tracy)"
+        if: ${{ !steps.restore-cache.outputs.cache-hit }}
+        run: cabal build all $CABAL_OPTS -f+tracy --only-dependencies
+
+      - name: "Save cache"
+        if: ${{ !steps.restore-cache.outputs.cache-hit }}
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ steps.setup-haskell.outputs.cabal-store }}
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+
+      - name: "Build (+tracy)"
+        run: cabal build all $CABAL_OPTS -f+tracy
+
+      - name: "Haddock (+tracy)"
+        run: cabal haddock accelerate-tracy $CABAL_OPTS -f+tracy --disable-documentation
+
+      - name: "Configure (-tracy)"
+        run: |
+          cabal configure $CABAL_OPTS -f-tracy
+          cabal build all --dry-run $CABAL_OPTS -f-tracy
+
+      - name: "Build (-tracy)"
+        run: cabal build all $CABAL_OPTS -f-tracy
+
+      - name: "Haddock (-tracy)"
+        run: cabal haddock accelerate-tracy $CABAL_OPTS -f-tracy --disable-documentation
+
+  stack:
+    name: "Stack: GHC ${{ matrix.ghc }} on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          # - macOS-latest    # See https://github.com/AccelerateHS/accelerate-tracy/issues/1
+          # - windows-latest  # See https://github.com/AccelerateHS/accelerate-tracy/issues/2
+        ghc:
+          - 9.4.8
+          - 9.14.1
+    env:
+      STACK_YAML: stack-${{ matrix.ghc }}.yaml
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: "Install system dependencies (Linux)"
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            libfreetype-dev \
+            libglfw3-dev \
+            libgtk-3-dev \
+            libtbb-dev \
+            pkg-config
+
+      - name: "Install system dependencies (macOS)"
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew install \
+            cmake \
+            freetype \
+            glfw \
+            pkg-config
+
+      - name: "Setup Haskell"
+        id: setup-haskell
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          enable-stack: true
+          stack-version: latest
+          stack-no-global: true
+
+      - name: "Compute cache keys"
+        id: keys
+        run: |
+          ts_yyyymm="$(date +%Y%m)"
+          prefix="${{ runner.os }}-${{ runner.arch }}-${ts_yyyymm}-ghc-${{ matrix.ghc }}-stack-${{ steps.setup-haskell.outputs.stack-version }}"
+          deps="${{ hashFiles(env.STACK_YAML, '**/*.cabal') }}"
+          src="${{ hashFiles('**/*.hs', '**/*.hs-boot', '**/*.lhs') }}"
+          echo "root-prefix=${prefix}-root-"              >> "$GITHUB_OUTPUT"
+          echo "root=${prefix}-root-${deps}"              >> "$GITHUB_OUTPUT"
+          echo "work-prefix=${prefix}-work-"              >> "$GITHUB_OUTPUT"
+          echo "work-prefix-deps=${prefix}-work-${deps}-" >> "$GITHUB_OUTPUT"
+          echo "work=${prefix}-work-${deps}-${src}"       >> "$GITHUB_OUTPUT"
+
+      - name: "Restore root cache"
+        id: restore-root-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ steps.setup-haskell.outputs.stack-root }}
+          key: ${{ steps.keys.outputs.root }}
+          restore-keys: ${{ steps.keys.outputs.root-prefix }}
+
+      - name: "Restore work cache"
+        id: restore-work-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: "**.stack-work"
+          key: ${{ steps.keys.outputs.work }}
+          restore-keys: |
+            ${{ steps.keys.outputs.work-prefix-deps }}
+            ${{ steps.keys.outputs.work-prefix }}
+
+      - name: "Setup"
+        run: stack setup
+
+      - name: "Build dependencies (+tracy)"
+        run: stack build $STACK_OPTS --flag accelerate-tracy:tracy --only-dependencies
+
+      - name: "Save root cache"
+        if: ${{ !cancelled() && steps.restore-root-cache.outcome == 'success' && steps.restore-root-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ steps.setup-haskell.outputs.stack-root }}
+          key: ${{ steps.restore-root-cache.outputs.cache-primary-key }}
+
+      - name: "Build (+tracy)"
+        run: stack build $STACK_OPTS --flag accelerate-tracy:tracy
+
+      - name: "Haddock (+tracy)"
+        run: stack haddock accelerate-tracy:lib $STACK_OPTS --flag accelerate-tracy:tracy
+
+      - name: "Save work cache"
+        if: ${{ !cancelled() && steps.restore-work-cache.outcome == 'success' && steps.restore-work-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v6
+        with:
+          path: '**/.stack-work'
+          key: ${{ steps.restore-work-cache.outputs.cache-primary-key }}
+
+      - name: "Build (-tracy)"
+        run: stack build $STACK_OPTS --flag accelerate-tracy:-tracy
+
+      - name: "Haddock (-tracy)"
+        run: stack haddock accelerate-tracy:lib $STACK_OPTS --flag accelerate-tracy:-tracy
