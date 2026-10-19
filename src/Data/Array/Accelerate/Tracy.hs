@@ -12,6 +12,9 @@
 
 module Data.Array.Accelerate.Tracy (
 
+  -- * Meta
+  tracyIsEnabled,
+
   -- * Types
   SrcLoc, Zone,
 
@@ -35,6 +38,19 @@ import Data.Word
 import Foreign.C.String
 import Foreign.C.Types
 import Foreign.Ptr
+
+{-------------------------------------------------------------------------------
+  Meta
+-------------------------------------------------------------------------------}
+
+-- | 'True' when Tracy is enabled
+{-# INLINE tracyIsEnabled #-}
+tracyIsEnabled :: Bool
+#ifdef ACCELERATE_TRACY
+tracyIsEnabled = True
+#else
+tracyIsEnabled = False
+#endif
 
 {-------------------------------------------------------------------------------
   Types
