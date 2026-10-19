@@ -35,8 +35,8 @@ tested-with:
 
 extra-source-files:
   -- installed header
-  cbits/flag-no-tracy/flag_tracy.h
-  cbits/flag-tracy/flag_tracy.h
+  cbits/accelerate-tracy-disable/accelerate_tracy.h
+  cbits/accelerate-tracy-enable/accelerate_tracy.h
   -- vendored licenses
   cbits/tracy/LICENSE
   cbits/tracy/public/libbacktrace/LICENSE
@@ -121,7 +121,7 @@ library
 
   if flag(tracy-client) || flag(tracy)
     include-dirs:
-      cbits/flag-tracy
+      cbits/accelerate-tracy-enable
       cbits/tracy/public
 
     -- Virtual package @system-cxx-std-lib@ is used to link the C++ standard
@@ -163,12 +163,14 @@ library
 
   else
     include-dirs:
-      cbits/flag-no-tracy
+      cbits/accelerate-tracy-disable
 
-  -- This header is installed from either @cbits/flag-tracy@ or
-  -- @cbits/flag-no-tracy@, depending on the above conditional.  This provides
-  -- @ACCELERATE_TRACY@ macro support in dependent libraries.
-  install-includes: flag_tracy.h
+  -- This header is installed from either @cbits/accelerate-tracy-enable@ or
+  -- @cbits/accelerate-tracy-disable@, depending on the above conditional.  When
+  -- Tracy is enabled, it defines @ACCELERATE_TRACY@ and provides a C API backed
+  -- by actual functions.  When Tracy is disabled, it provides a C API that is
+  -- no-ops.
+  install-includes: accelerate_tracy.h
 
 -- When enabled, a mock executable is built from @Main.hs@, and then Tracy
 -- executable @tracy-capture@ is built from C++ sources in a post-build hook.
