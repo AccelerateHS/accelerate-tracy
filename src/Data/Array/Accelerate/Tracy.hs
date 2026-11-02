@@ -21,7 +21,6 @@ module Data.Array.Accelerate.Tracy (
 
 ) where
 
-import Data.Int
 import Foreign.C.String
 import Foreign.C.Types
 import Foreign.Ptr
@@ -47,7 +46,6 @@ tracyIsEnabled = False
 emitMemoryAlloc
   :: Ptr a  -- ^ @ptr@
   -> CSize  -- ^ @size@
-  -> Int32  -- ^ @secure@
   -> IO ()
 #if defined(ACCELERATE_TRACY)
 emitMemoryAlloc = emitMemoryAlloc'
@@ -55,7 +53,6 @@ foreign import capi unsafe "tracy/TracyC.h ___tracy_emit_memory_alloc"
   emitMemoryAlloc'
     :: Ptr a
     -> CSize
-    -> Int32
     -> IO ()
 #else
 emitMemoryAlloc = stub
@@ -64,14 +61,12 @@ emitMemoryAlloc = stub
 -- | @___tracy_emit_memory_free@
 emitMemoryFree
   :: Ptr a  -- ^ @ptr@
-  -> Int32  -- ^ @size@
   -> IO ()
 #if defined(ACCELERATE_TRACY)
 emitMemoryFree = emitMemoryFree'
 foreign import capi unsafe "tracy/TracyC.h ___tracy_emit_memory_free"
   emitMemoryFree'
     :: Ptr a
-    -> Int32
     -> IO ()
 #else
 emitMemoryFree = stub
@@ -81,7 +76,6 @@ emitMemoryFree = stub
 emitMemoryAllocNamed
   :: Ptr a    -- ^ @ptr@
   -> CSize    -- ^ @size@
-  -> Int32    -- ^ @secure@
   -> CString  -- ^ @name@
   -> IO ()
 #if defined(ACCELERATE_TRACY)
@@ -90,7 +84,6 @@ foreign import capi unsafe "tracy/TracyC.h ___tracy_emit_memory_alloc_named"
   emitMemoryAllocNamed'
     :: Ptr a
     -> CSize
-    -> Int32
     -> CString
     -> IO ()
 #else
@@ -100,7 +93,6 @@ emitMemoryAllocNamed = stub
 -- | @___tracy_emit_memory_free_named@
 emitMemoryFreeNamed
   :: Ptr a    -- ^ @ptr@
-  -> Int32    -- ^ @secure@
   -> CString  -- ^ @name@
   -> IO ()
 #if defined(ACCELERATE_TRACY)
@@ -108,7 +100,6 @@ emitMemoryFreeNamed = emitMemoryFreeNamed'
 foreign import capi unsafe "tracy/TracyC.h ___tracy_emit_memory_free_named"
   emitMemoryFreeNamed'
     :: Ptr a
-    -> Int32
     -> CString
     -> IO ()
 #else
@@ -158,6 +149,3 @@ instance Stub b => Stub (IO b) where
 
 instance Stub () where
   stub = ()
-
-instance Stub Int32 where
-  stub = 0

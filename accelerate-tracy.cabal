@@ -46,22 +46,45 @@ extra-source-files:
   cbits/tracy/public/**/*.hpp
   -- vendored executable code
   cbits/tracy/capture/CMakeLists.txt
-  cbits/tracy/capture/src/**/*.cpp
+  cbits/tracy/capture/CMakePresets.json
+  cbits/tracy/capture/src/*.cpp
+  cbits/tracy/capture/src/*.hpp
   cbits/tracy/cmake/*.cmake
   cbits/tracy/cmake/*.patch
+  cbits/tracy/csvexport/CMakeLists.txt
+  cbits/tracy/csvexport/CMakePresets.json
+  cbits/tracy/csvexport/src/*.cpp
+  cbits/tracy/dtl/*.hpp
   cbits/tracy/getopt/*.c
   cbits/tracy/getopt/*.h
+  cbits/tracy/import/CMakeLists.txt
+  cbits/tracy/import/CMakePresets.json
+  cbits/tracy/import/src/*.cpp
+  cbits/tracy/manual/tracy.md
+  cbits/tracy/merge/CMakeLists.txt
+  cbits/tracy/merge/CMakePresets.json
+  cbits/tracy/merge/src/*.cpp
+  cbits/tracy/monitor/CMakeLists.txt
+  cbits/tracy/monitor/src/*.cpp
   cbits/tracy/profiler/CMakeLists.txt
+  cbits/tracy/profiler/CMakePresets.json
+  cbits/tracy/profiler/helpers/CMakeLists.txt
+  cbits/tracy/profiler/helpers/*.cpp
   cbits/tracy/profiler/src/**/*.c
   cbits/tracy/profiler/src/**/*.cpp
   cbits/tracy/profiler/src/**/*.h
   cbits/tracy/profiler/src/**/*.hpp
-  cbits/tracy/public/libbacktrace/*.cpp
-  cbits/tracy/public/libbacktrace/*.h
-  cbits/tracy/public/libbacktrace/*.hpp
+  cbits/tracy/profiler/src/**/*.json
+  cbits/tracy/profiler/src/**/*.md
+  cbits/tracy/profiler/src/**/*.otf
+  cbits/tracy/profiler/src/**/*.ttf
   cbits/tracy/server/*.cpp
   cbits/tracy/server/*.h
   cbits/tracy/server/*.hpp
+  cbits/tracy/update/CMakeLists.txt
+  cbits/tracy/update/CMakePresets.json
+  cbits/tracy/update/src/*.cpp
+  cbits/tracy/update/src/*.h
 
 extra-doc-files:
   CHANGELOG.md

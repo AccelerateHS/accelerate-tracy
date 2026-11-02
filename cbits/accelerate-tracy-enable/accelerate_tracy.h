@@ -18,8 +18,16 @@ struct ___tracy_source_location_data
     uint32_t color;
 };
 
-// Unsafe hack, which we can no longer do with recent versions of Tracy
-typedef uint64_t TracyCZoneCtx;
+struct ___tracy_c_zone_context
+{
+    uint32_t id;
+    int32_t active;
+#ifdef TRACY_ON_DEMAND
+    uint64_t connectionId;
+#endif
+};
+
+typedef /*const*/ struct ___tracy_c_zone_context TracyCZoneCtx;
 
 extern TracyCZoneCtx ___tracy_emit_zone_begin( const struct ___tracy_source_location_data* srcloc, int32_t active );
 
@@ -27,9 +35,9 @@ extern void ___tracy_emit_zone_end( TracyCZoneCtx ctx );
 
 extern void ___tracy_emit_zone_color( TracyCZoneCtx ctx, uint32_t color );
 
-extern void ___tracy_emit_memory_alloc( const void* ptr, size_t size, int32_t secure );
+extern void ___tracy_emit_memory_alloc( const void* ptr, size_t size );
 
-extern void ___tracy_emit_memory_free( const void* ptr, int32_t secure );
+extern void ___tracy_emit_memory_free( const void* ptr );
 
 // Accelerate extras
 
@@ -78,8 +86,8 @@ static uint32_t acc_get_color_variant(uint32_t color, ColorVariant variant) {
 
 #define AccTracyEmitZoneEnd( ctx ) ___tracy_emit_zone_end(ctx)
 
-#define AccTracyEmitMemoryAlloc( ptr, size, secure ) ___tracy_emit_memory_alloc(ptr, size, secure)
+#define AccTracyEmitMemoryAlloc( ptr, size ) ___tracy_emit_memory_alloc(ptr, size)
 
-#define AccTracyEmitMemoryFree( ptr, secure ) ___tracy_emit_memory_free(ptr, secure)
+#define AccTracyEmitMemoryFree( ptr ) ___tracy_emit_memory_free(ptr)
 
 #endif // __ACCELERATE_TRACY_H__
