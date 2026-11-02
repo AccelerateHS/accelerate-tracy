@@ -7,10 +7,6 @@
 
 #define AccTracyEmitZoneEnd( ctx )
 
-#define AccTracyEmitKernelBeginCB( data )
-
-#define AccTracyEmitKernelEndCB( data )
-
 #define AccTracyEmitMemoryAlloc( ptr, size, secure )
 
 #define AccTracyEmitMemoryFree( ptr, secure )

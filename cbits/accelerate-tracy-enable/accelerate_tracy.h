@@ -18,18 +18,10 @@ struct ___tracy_source_location_data
     uint32_t color;
 };
 
-struct ___tracy_c_zone_context
-{
-    uint32_t id;
-    int32_t active;
-};
-
 // Unsafe hack, which we can no longer do with recent versions of Tracy
 typedef uint64_t TracyCZoneCtx;
 
 extern TracyCZoneCtx ___tracy_emit_zone_begin( const struct ___tracy_source_location_data* srcloc, int32_t active );
-
-extern TracyCZoneCtx ___tracy_emit_zone_begin_alloc( uint64_t srcloc, int32_t active );
 
 extern void ___tracy_emit_zone_end( TracyCZoneCtx ctx );
 
@@ -78,17 +70,6 @@ static uint32_t acc_get_color_variant(uint32_t color, ColorVariant variant) {
          ((b & 0xFF));
 }
 
-void acc_tracy_emit_kernel_begin_cb(void *data) {
-  uint64_t *payload = (uint64_t*) data;
-  payload[1] = ___tracy_emit_zone_begin_alloc(payload[0], 1);
-}
-
-void acc_tracy_emit_kernel_end_cb(void *data) {
-  uint64_t *payload = (uint64_t*) data;
-  ___tracy_emit_zone_end(payload[1]);
-  /* free(data); */
-}
-
 // Macro API backed by actual functions
 
 #define AccTracyEmitZoneBegin( ctx, srcloc, color_variant ) \
@@ -96,10 +77,6 @@ void acc_tracy_emit_kernel_end_cb(void *data) {
   ___tracy_emit_zone_color(ctx, acc_get_color_variant((srcloc)->color, color_variant))
 
 #define AccTracyEmitZoneEnd( ctx ) ___tracy_emit_zone_end(ctx)
-
-#define AccTracyEmitKernelBeginCB( data ) acc_tracy_emit_kernel_begin_cb(data)
-
-#define AccTracyEmitKernelEndCB( data ) acc_tracy_emit_kernel_end_cb(data)
 
 #define AccTracyEmitMemoryAlloc( ptr, size, secure ) ___tracy_emit_memory_alloc(ptr, size, secure)
 
