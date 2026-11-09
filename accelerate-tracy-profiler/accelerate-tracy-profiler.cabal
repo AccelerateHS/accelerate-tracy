@@ -38,7 +38,13 @@ extra-source-files:
   cbits/tracy/import/CMakeLists.txt
   cbits/tracy/import/CMakePresets.json
   cbits/tracy/import/src/*.cpp
-  cbits/tracy/manual/tracy.md
+  cbits/tracy/manual/*.bib
+  cbits/tracy/manual/*.lua
+  cbits/tracy/manual/*.py
+  cbits/tracy/manual/*.tex
+  cbits/tracy/manual/icons/*.pdf
+  cbits/tracy/manual/icons/*.svg
+  cbits/tracy/manual/images/*.png
   cbits/tracy/merge/CMakeLists.txt
   cbits/tracy/merge/CMakePresets.json
   cbits/tracy/merge/src/*.cpp
@@ -55,8 +61,9 @@ extra-source-files:
   cbits/tracy/profiler/src/**/*.hpp
   cbits/tracy/profiler/src/**/*.json
   cbits/tracy/profiler/src/**/*.md
-  cbits/tracy/profiler/src/**/*.otf
-  cbits/tracy/profiler/src/**/*.ttf
+  cbits/tracy/profiler/src/font/*.otf
+  cbits/tracy/profiler/src/font/*.ttc
+  cbits/tracy/profiler/src/font/*.ttf
   cbits/tracy/public/common/*.cpp
   cbits/tracy/public/common/*.h
   cbits/tracy/public/common/*.hpp

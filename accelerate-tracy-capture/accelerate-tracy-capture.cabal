@@ -30,7 +30,6 @@ extra-source-files:
   cbits/tracy/capture/CMakeLists.txt
   cbits/tracy/capture/CMakePresets.json
   cbits/tracy/capture/src/*.cpp
-  cbits/tracy/capture/src/*.hpp
   cbits/tracy/cmake/*.cmake
   cbits/tracy/cmake/*.patch
   cbits/tracy/getopt/*.c
@@ -41,6 +40,8 @@ extra-source-files:
   cbits/tracy/server/*.cpp
   cbits/tracy/server/*.h
   cbits/tracy/server/*.hpp
+  cbits/tracy/util/*.cpp
+  cbits/tracy/util/*.hpp
 
 extra-doc-files:
   CHANGELOG.md
