@@ -115,7 +115,7 @@ jobs:
         run: cabal build all $CABAL_OPTS -f+tracy
 
       - name: "Haddock (+tracy)"
-        run: cabal haddock accelerate-tracy $CABAL_OPTS -f+tracy --disable-documentation
+        run: cabal haddock accelerate-tracy-lib $CABAL_OPTS -f+tracy --disable-documentation
 
       - name: "Configure (-tracy)"
         run: |
@@ -126,7 +126,7 @@ jobs:
         run: cabal build all $CABAL_OPTS -f-tracy
 
       - name: "Haddock (-tracy)"
-        run: cabal haddock accelerate-tracy $CABAL_OPTS -f-tracy --disable-documentation
+        run: cabal haddock accelerate-tracy-lib $CABAL_OPTS -f-tracy --disable-documentation
 
   stack:
     name: "Stack: GHC ${{ matrix.ghc }} on ${{ matrix.os }}"
@@ -218,7 +218,7 @@ jobs:
         run: stack setup
 
       - name: "Build dependencies (+tracy)"
-        run: stack build $STACK_OPTS --flag accelerate-tracy:tracy --only-dependencies
+        run: stack build $STACK_OPTS --flag accelerate-tracy-lib:tracy --only-dependencies
 
       - name: "Save root cache"
         if: ${{ !cancelled() && steps.restore-root-cache.outcome == 'success' && steps.restore-root-cache.outputs.cache-hit != 'true' }}
@@ -228,10 +228,10 @@ jobs:
           key: ${{ steps.restore-root-cache.outputs.cache-primary-key }}
 
       - name: "Build (+tracy)"
-        run: stack build $STACK_OPTS --flag accelerate-tracy:tracy
+        run: stack build $STACK_OPTS --flag accelerate-tracy-lib:tracy
 
       - name: "Haddock (+tracy)"
-        run: stack haddock accelerate-tracy:lib $STACK_OPTS --flag accelerate-tracy:tracy
+        run: stack haddock accelerate-tracy-lib:lib $STACK_OPTS --flag accelerate-tracy-lib:tracy
 
       - name: "Save work cache"
         if: ${{ !cancelled() && steps.restore-work-cache.outcome == 'success' && steps.restore-work-cache.outputs.cache-hit != 'true' }}
@@ -241,7 +241,7 @@ jobs:
           key: ${{ steps.restore-work-cache.outputs.cache-primary-key }}
 
       - name: "Build (-tracy)"
-        run: stack build $STACK_OPTS --flag accelerate-tracy:-tracy
+        run: stack build $STACK_OPTS --flag accelerate-tracy-lib:-tracy
 
       - name: "Haddock (-tracy)"
-        run: stack haddock accelerate-tracy:lib $STACK_OPTS --flag accelerate-tracy:-tracy
+        run: stack haddock accelerate-tracy-lib:lib $STACK_OPTS --flag accelerate-tracy-lib:-tracy

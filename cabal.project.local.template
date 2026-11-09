@@ -5,8 +5,5 @@
 --with-compiler: ghc-9.12.4
 --with-compiler: ghc-9.14.1
 
---package accelerate-tracy
-  --flags: +tracy-client
-  --flags: +tracy-capture
-  --flags: +tracy-profiler
+--package accelerate-tracy-lib
   --flags: +tracy

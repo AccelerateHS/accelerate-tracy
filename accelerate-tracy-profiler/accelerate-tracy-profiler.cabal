@@ -1,0 +1,114 @@
+cabal-version:      3.0
+name:               accelerate-tracy-profiler
+version:            0.1.0.0
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             The Accelerate Team
+maintainer:         Trevor L. McDonell <trevor.mcdonell@gmail.com>
+category:           Accelerate
+build-type:         Custom
+synopsis:           Tracy tracy-profiler program
+
+description:
+  This package provides an easy way to install the @tracy-profiler@ program
+  of [Tracy profiler](https://github.com/wolfpld/tracy#tracy-profiler) for
+  profiling [Accelerate](https://www.acceleratehs.org/) kernels.
+
+  For details, please see the README on GitHub at
+  <https://github.com/AccelerateHS/accelerate-tracy#readme>.
+
+tested-with:
+  GHC ==9.4.8
+   || ==9.6.7
+   || ==9.8.4
+   || ==9.10.3
+   || ==9.12.2
+   || ==9.14.1
+
+extra-source-files:
+  cbits/tracy/LICENSE
+  cbits/tracy/cmake/*.cmake
+  cbits/tracy/cmake/*.patch
+  cbits/tracy/csvexport/CMakeLists.txt
+  cbits/tracy/csvexport/CMakePresets.json
+  cbits/tracy/csvexport/src/*.cpp
+  cbits/tracy/dtl/*.hpp
+  cbits/tracy/getopt/*.c
+  cbits/tracy/getopt/*.h
+  cbits/tracy/import/CMakeLists.txt
+  cbits/tracy/import/CMakePresets.json
+  cbits/tracy/import/src/*.cpp
+  cbits/tracy/manual/tracy.md
+  cbits/tracy/merge/CMakeLists.txt
+  cbits/tracy/merge/CMakePresets.json
+  cbits/tracy/merge/src/*.cpp
+  cbits/tracy/monitor/CMakeLists.txt
+  cbits/tracy/monitor/src/*.cpp
+  cbits/tracy/profiler/CMakeLists.txt
+  cbits/tracy/profiler/CMakePresets.json
+  cbits/tracy/profiler/helpers/CMakeLists.txt
+  cbits/tracy/profiler/helpers/*.cpp
+  cbits/tracy/profiler/macos/Info.plist.in
+  cbits/tracy/profiler/src/**/*.c
+  cbits/tracy/profiler/src/**/*.cpp
+  cbits/tracy/profiler/src/**/*.h
+  cbits/tracy/profiler/src/**/*.hpp
+  cbits/tracy/profiler/src/**/*.json
+  cbits/tracy/profiler/src/**/*.md
+  cbits/tracy/profiler/src/**/*.otf
+  cbits/tracy/profiler/src/**/*.ttf
+  cbits/tracy/public/common/*.cpp
+  cbits/tracy/public/common/*.h
+  cbits/tracy/public/common/*.hpp
+  cbits/tracy/server/*.cpp
+  cbits/tracy/server/*.h
+  cbits/tracy/server/*.hpp
+  cbits/tracy/update/CMakeLists.txt
+  cbits/tracy/update/CMakePresets.json
+  cbits/tracy/update/src/*.cpp
+  cbits/tracy/update/src/*.h
+
+extra-doc-files:
+  CHANGELOG.md
+  README.md
+
+custom-setup
+  setup-depends:
+    , base      >= 4.17.2.1 && < 4.23
+    , Cabal     >= 3.8.1    && < 3.18
+    , directory >= 1.3.7.1  && < 1.4
+    , filepath  >= 1.4.2.2  && < 1.6
+
+executable tracy-profiler
+  hs-source-dirs:   app
+  main-is:          Main.hs
+
+  other-modules:
+    Paths_accelerate_tracy_profiler
+    PathsBuild_accelerate_tracy_profiler
+
+  autogen-modules:
+    Paths_accelerate_tracy_profiler
+    PathsBuild_accelerate_tracy_profiler
+
+  build-depends:
+    , accelerate-tracy-lib == 0.1.0.0
+    , base                 >= 4.17.2.1 && < 4.23
+    , directory            >= 1.3.7.1  && < 1.4
+    , filepath             >= 1.4.2.2  && < 1.6
+    , process              >= 1.6.18   && < 1.7
+
+  default-language: GHC2021
+
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wno-unticked-promoted-constructors
+    -Wredundant-constraints
+    -Wno-unused-packages
+
+  -- TODO build Tracy executables on Windows
+  -- <https://github.com/AccelerateHS/accelerate-tracy/issues/2>
+  if os(windows)
+    buildable:      False

@@ -7,69 +7,54 @@
 
 </div>
 
-This package implements support for using the [Tracy profiler][] to profile
-[Accelerate][] kernels.
+This repository contains the following packages:
 
-[Tracy profiler]: https://github.com/wolfpld/tracy#tracy-profiler
-[Accelerate]: https://www.acceleratehs.org/
+* [`accelerate-tracy-lib`](accelerate-tracy-lib/README.md) implements support
+  for using [Tracy profiler][] to profile [Accelerate][] kernels.
+* [`accelerate-tracy-capture`](accelerate-tracy-capture/README.md) provides an
+  easy way to install the matching version of the `tracy-capture` CLI program.
+* [`accelerate-tracy-profiler`](accelerate-tracy-profiler/README.md) provides an
+  easy way to install the matching version of the `tracy-profiler` GUI program.
+
+[Tracy profiler]: <https://github.com/wolfpld/tracy#tracy-profiler>
+[Accelerate]: <https://www.acceleratehs.org/>
 
 ## Usage
 
-Tracy profiling support is disabled by default.  Use Cabal flags to enable Tracy
-profiling in Accelerate kernels as well as build Tracy executables:
-
-* `+tracy-client` enables Tracy profiling support in Accelerate kernels
-* `+tracy-capture` builds the `tracy-capture` executable (CLI)
-* `+tracy-profiler` builds the `tracy-profiler` executable (GUI)
-* `+tracy` is equivalent to setting all of the above flags
-
-> [!NOTE]
-> The API provided by this package is for internal use in Accelerate packages.
-> Accelerate users do not need to use this API; simply enable Tracy profiling
-> when building your program and use one of the Tracy executables to profile the
-> program when running it.
-
-### Client
-
-When Tracy profiling support is enabled (using `+tracy-client` or `+tracy`),
-Tracy client code is compiled into Accelerate programs.  The C++ compiler may
-display warnings, which GHC displays as (non-fatal) errors.  These are upstream
-warnings and may be ignored in the context of this package.
-
-Tracy profiling currently only works with `accelerate-llvm-native`.  For PTX
-profiling, use NVIDIA Nsight instead.
-
-### Tracy Executables
+See each package for usage information.
 
 > [!IMPORTANT]
 > Tracy executables must be the same version of Tracy that the Accelerate
 > program was build with.
 
-The following software is required to build the executables:
-
-* `CMake`
-* `pkg-config`
-* `freetype2`
-* `glfw3`
-* `gtk3` (Linux only)
-* `TBB` (should be part of your compiler toolchain
-
-You can install all of these on Debian/Ubuntu via:
-
-```
-sudo apt install cmake pkg-config libfreetype-dev libglfw3-dev libgtk-3-dev libtbb-dev
-```
-
-You can install all of these on macOS via:
-
-```
-brew install cmake pkg-config freetype glfw
-```
-
 ## Development
 
 Since this package is for internal use in Accelerate packages, we aim to
 minimize the Haskell bindings, only implementing those that are required.
+
+### Git submodules
+
+This repository pins a specific Tracy commit in multiple submodules.  These must
+be kept in sync.  This is necessary because of the way that Cabal builds source
+distributions.
+
+When you create a new clone or worktree, initialize the submodules as follows:
+
+```
+git update --init --recursive
+```
+
+You can check the status of the submodules as follows:
+
+```
+git submodule status
+```
+
+### Versioning
+
+The versions of the packages in this repository must be kept in sync.
+Executables depend on the specific version of the `accelerate-tracy-lib`
+package, to ensure that matching versions are installed.
 
 ### Cabal
 
@@ -98,7 +83,7 @@ and `stack.yaml` links to the configuration with latest configured LTS.  To test
 using a different version, use the `--stack-yaml` option.  Example:
 
 ```
-stack build --stack-yaml stack-9.4.8.yaml --flag accelerate-tracy:tracy
+stack build --stack-yaml stack-9.4.8.yaml --flag accelerate-tracy-lib:tracy
 ```
 
 You may temporarily configure flags in Stack configuration, but be careful to

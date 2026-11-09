@@ -1,0 +1,88 @@
+cabal-version:      3.0
+name:               accelerate-tracy-capture
+version:            0.1.0.0
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             The Accelerate Team
+maintainer:         Trevor L. McDonell <trevor.mcdonell@gmail.com>
+category:           Accelerate
+build-type:         Custom
+synopsis:           Tracy tracy-capture program
+
+description:
+  This package provides an easy way to install the @tracy-capture@ program
+  of [Tracy profiler](https://github.com/wolfpld/tracy#tracy-profiler) for
+  profiling [Accelerate](https://www.acceleratehs.org/) kernels.
+
+  For details, please see the @accelerate-tracy@ README on GitHub at
+  <https://github.com/AccelerateHS/accelerate-tracy#readme>.
+
+tested-with:
+  GHC ==9.4.8
+   || ==9.6.7
+   || ==9.8.4
+   || ==9.10.3
+   || ==9.12.2
+   || ==9.14.1
+
+extra-source-files:
+  cbits/tracy/LICENSE
+  cbits/tracy/capture/CMakeLists.txt
+  cbits/tracy/capture/CMakePresets.json
+  cbits/tracy/capture/src/*.cpp
+  cbits/tracy/capture/src/*.hpp
+  cbits/tracy/cmake/*.cmake
+  cbits/tracy/cmake/*.patch
+  cbits/tracy/getopt/*.c
+  cbits/tracy/getopt/*.h
+  cbits/tracy/public/common/*.cpp
+  cbits/tracy/public/common/*.h
+  cbits/tracy/public/common/*.hpp
+  cbits/tracy/server/*.cpp
+  cbits/tracy/server/*.h
+  cbits/tracy/server/*.hpp
+
+extra-doc-files:
+  CHANGELOG.md
+  README.md
+
+custom-setup
+  setup-depends:
+    , base      >= 4.17.2.1 && < 4.23
+    , Cabal     >= 3.8.1    && < 3.18
+    , directory >= 1.3.7.1  && < 1.4
+    , filepath  >= 1.4.2.2  && < 1.6
+
+executable tracy-capture
+  hs-source-dirs:   app
+  main-is:          Main.hs
+
+  other-modules:
+    Paths_accelerate_tracy_capture
+    PathsBuild_accelerate_tracy_capture
+
+  autogen-modules:
+    Paths_accelerate_tracy_capture
+    PathsBuild_accelerate_tracy_capture
+
+  build-depends:
+    , accelerate-tracy-lib == 0.1.0.0
+    , base                 >= 4.17.2.1 && < 4.23
+    , directory            >= 1.3.7.1  && < 1.4
+    , filepath             >= 1.4.2.2  && < 1.6
+    , process              >= 1.6.18   && < 1.7
+
+  default-language: GHC2021
+
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wno-unticked-promoted-constructors
+    -Wredundant-constraints
+    -Wno-unused-packages
+
+  -- TODO build Tracy executables on Windows
+  -- <https://github.com/AccelerateHS/accelerate-tracy/issues/2>
+  if os(windows)
+    buildable:      False

@@ -1,0 +1,124 @@
+cabal-version:      3.0
+name:               accelerate-tracy-lib
+version:            0.1.0.0
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             The Accelerate Team
+maintainer:         Trevor L. McDonell <trevor.mcdonell@gmail.com>
+category:           Accelerate
+build-type:         Simple
+synopsis:           Tracy profiling support for the Accelerate language
+
+description:
+  This package implements support for using
+  [Tracy profiler](https://github.com/wolfpld/tracy#tracy-profiler) to profile
+  [Accelerate](https://www.acceleratehs.org/) kernels.
+
+  Tracy profiling support is disabled by default.  Use Cabal flag @tracy@ to
+  enable profiling.
+
+  For details, please see the README on GitHub at
+  <https://github.com/AccelerateHS/accelerate-tracy#readme>.
+
+tested-with:
+  GHC ==9.4.8
+   || ==9.6.7
+   || ==9.8.4
+   || ==9.10.3
+   || ==9.12.2
+   || ==9.14.1
+
+extra-source-files:
+  -- installed header
+  cbits/accelerate-tracy-disable/accelerate_tracy.h
+  cbits/accelerate-tracy-enable/accelerate_tracy.h
+  -- vendored licenses
+  cbits/tracy/LICENSE
+  cbits/tracy/public/libbacktrace/LICENSE
+  -- vendored client code
+  cbits/tracy/public/**/*.cpp
+  cbits/tracy/public/**/*.h
+  cbits/tracy/public/**/*.hpp
+
+extra-doc-files:
+  CHANGELOG.md
+  README.md
+
+flag tracy
+  manual:           True
+  default:          False
+  description:      Enable Tracy profiling support in Accelerate kernels
+
+library
+  hs-source-dirs:   src
+  exposed-modules:  Data.Array.Accelerate.Tracy
+
+  build-depends:
+    , base >= 4.17.2.1 && < 4.23
+
+  default-language: GHC2021
+
+  other-extensions:
+    CApiFFI
+    CPP
+
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wno-unticked-promoted-constructors
+    -Wredundant-constraints
+    -Wunused-packages
+
+  if flag(tracy)
+    include-dirs:
+      cbits/accelerate-tracy-enable
+      cbits/tracy/public
+
+    -- Virtual package @system-cxx-std-lib@ is used to link the C++ standard
+    -- library.
+    build-depends:
+      system-cxx-std-lib == 1.0
+
+    ghc-options:
+      -- Option @-Wno-unused-packages@ suppresses the @system-cxx-std-lib@ false
+      -- positive warning in GHC <10.
+      -Wno-unused-packages
+      -- The C macros must be defined using @-optc@ because generated @CApiFFI@
+      -- C code includes the C header.  Using @cc-options@ does not work.
+      -optc-DTRACY_ENABLE
+      -optc-DTRACY_NO_SAMPLING
+
+    cpp-options:
+      -DACCELERATE_TRACY
+
+    cxx-sources:
+      cbits/tracy/public/TracyClient.cpp
+
+    cxx-options:
+      -DTRACY_ENABLE
+      -DTRACY_NO_SAMPLING
+      -std=c++20
+      -Wall
+
+    -- Accelerate backends may use dynamic linking to load compiled kernels that
+    -- directly call Tracy functions.  In that case, these symbols need to be
+    -- available in the global namespace.  @-rdynamic@ implies
+    -- @-Wl,--export-dynamic@, which adds every symbol to the dynamic symbol
+    -- table.  Options @--export-dynamic-symbol=glob@ and
+    -- @--export-dynamic-symbol-list=file@ may be available, but these seem to
+    -- be less portable across compilers.
+    if !os(windows)
+      ld-options:
+        -rdynamic
+
+  else
+    include-dirs:
+      cbits/accelerate-tracy-disable
+
+  -- This header is installed from either @cbits/accelerate-tracy-enable@ or
+  -- @cbits/accelerate-tracy-disable@, depending on the above conditional.  When
+  -- Tracy is enabled, it defines @ACCELERATE_TRACY@ and provides a C API backed
+  -- by actual functions.  When Tracy is disabled, it provides a C API that is
+  -- no-ops.
+  install-includes: accelerate_tracy.h

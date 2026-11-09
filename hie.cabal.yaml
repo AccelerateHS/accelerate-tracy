@@ -1,5 +1,11 @@
 # Link `hie.yaml` to this file if you want to use HIE with Cabal.
 cradle:
   cabal:
-    - path: "src"
-      component: "lib:accelerate-tracy"
+    - path: "accelerate-tracy-lib/src"
+      component: "accelerate-tracy-lib:lib"
+
+    - path: "accelerate-tracy-capture/app"
+      component: "accelerate-tracy-capture:exe:tracy-capture"
+
+    - path: "accelerate-tracy-profiler/app"
+      component: "accelerate-tracy-profiler:exe:tracy-profiler"

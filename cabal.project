@@ -1,1 +1,4 @@
-packages: .
+packages:
+  accelerate-tracy-lib
+  accelerate-tracy-capture
+  accelerate-tracy-profiler
