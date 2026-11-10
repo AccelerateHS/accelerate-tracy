@@ -86,9 +86,24 @@ custom-setup
     , directory >= 1.3.7.1  && < 1.4
     , filepath  >= 1.4.2.2  && < 1.6
 
-executable tracy-profiler
-  hs-source-dirs:   app
-  main-is:          Main.hs
+common lang
+  build-depends:    base >= 4.17.2.1 && < 4.23
+
+  default-language: GHC2021
+
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wno-unticked-promoted-constructors
+    -Wredundant-constraints
+
+library
+  import:           lang
+  hs-source-dirs:   src
+
+  exposed-modules:
+    Data.Array.Accelerate.Tracy.Profiler
 
   other-modules:
     Paths_accelerate_tracy_profiler
@@ -105,15 +120,15 @@ executable tracy-profiler
     , filepath             >= 1.4.2.2  && < 1.6
     , process              >= 1.6.18   && < 1.7
 
-  default-language: GHC2021
-
   ghc-options:
-    -Wall
-    -Wcompat
-    -Widentities
-    -Wno-unticked-promoted-constructors
-    -Wredundant-constraints
     -Wno-unused-packages
+
+executable tracy-profiler
+  import:           lang
+  hs-source-dirs:   app
+  main-is:          Main.hs
+  build-depends:    accelerate-tracy-profiler
+  ghc-options:      -Wunused-packages
 
   -- TODO build Tracy executables on Windows
   -- <https://github.com/AccelerateHS/accelerate-tracy/issues/2>
