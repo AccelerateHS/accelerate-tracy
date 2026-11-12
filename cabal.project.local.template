@@ -1,9 +1,15 @@
+--------------------------------------------------------------------------------
+-- Uncomment one of the following to use a specific version of GHC.
+
 --with-compiler: ghc-9.4.8
 --with-compiler: ghc-9.6.7
 --with-compiler: ghc-9.8.4
 --with-compiler: ghc-9.10.3
 --with-compiler: ghc-9.12.4
 --with-compiler: ghc-9.14.1
+
+--------------------------------------------------------------------------------
+-- Adjust the following configuration to enable flags.
 
 --package accelerate-tracy-lib
   --flags: +tracy
