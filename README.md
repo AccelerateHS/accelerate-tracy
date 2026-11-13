@@ -10,11 +10,24 @@
 This repository contains the following packages:
 
 * [`accelerate-tracy-lib`](accelerate-tracy-lib/README.md) implements support
-  for using [Tracy profiler][] to profile [Accelerate][] kernels.
+  for using [Tracy profiler][] to profile [Accelerate][] kernels.  This package
+  is used internally by Accelerate packages.  Accelerate users do not need to
+  use this package, aside from setting the `tracy` flag to enable Tracy
+  profiling.
+
 * [`accelerate-tracy-capture`](accelerate-tracy-capture/README.md) provides an
   easy way to install the matching version of the `tracy-capture` CLI program.
+  Cabal users should use this package directly.
+* [`accelerate-tracy-capture-stack`](accelerate-tracy-capture-stack/README.md)
+  provides an easy way for Stack users to install the matching version of the
+  `tracy-capture` CLI program.
+
 * [`accelerate-tracy-profiler`](accelerate-tracy-profiler/README.md) provides an
   easy way to install the matching version of the `tracy-profiler` GUI program.
+  Cabal users should use this package directly.
+* [`accelerate-tracy-profiler-stack`](accelerate-tracy-profiler-stack/README.md)
+  provides an easy way for Stack users to install the matching version of the
+  `tracy-profiler` GUI program.
 
 [Tracy profiler]: <https://github.com/wolfpld/tracy#tracy-profiler>
 [Accelerate]: <https://www.acceleratehs.org/>
@@ -52,9 +65,17 @@ git submodule status
 
 ### Versioning
 
-The versions of the packages in this repository must be kept in sync.
-Executables depend on the specific version of the `accelerate-tracy-lib`
-package, to ensure that matching versions are installed.
+The versions of the following packages must be kept in sync.  Executables depend
+on the specific version of the `accelerate-tracy-lib` package, to ensure that
+matching versions are installed.
+
+* `accelerate-tracy-lib`
+* `accelerate-tracy-capture`
+* `accelerate-tracy-profiler`
+
+The Stack helper packages should never/rarely need to change.  They should
+support any version of the corresponding executable packages, so that users do
+not have to checkout a particular commit.
 
 ### Cabal
 

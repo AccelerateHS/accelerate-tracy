@@ -1,9 +1,11 @@
-resolver: lts-23.28
+snapshot: lts-23.28
 
 packages:
   - accelerate-tracy-lib
   - accelerate-tracy-capture
+  - accelerate-tracy-capture-stack
   - accelerate-tracy-profiler
+  - accelerate-tracy-profiler-stack
 
 #flags:
   #accelerate-tracy-lib:

@@ -61,15 +61,38 @@ cabal run tracy-capture -- [OPTIONS]
 
 ### Stack
 
-Configure the following in your `stack.yaml`:
+The easiest way to use `tracy-capture` with Stack is to clone this repository
+and configure `accelerate-tracy-capture-stack` as a *project package*.
 
-```
+For example, a project that clones this repository in the project directory
+using a Git submodule could be configured as follows:
+
+
+```yaml
+snapshot: lts-...
+
+packages:
+  - .
+  - accelerate-tracy/accelerate-tracy-capture-stack
+
 extra-deps:
-  - accelerate-tracy-capture-0.1.0.0
+  ...
+
+flags:
+  accelerate-tracy-lib:
+    tracy: true
 ```
 
-You must specify the same version number as `accelerate-tracy-lib`, either in
-your configured snapshot or explicitly specified in `extra-deps`.
+The version of `accelerate-tracy-lib` and `accelerate-tracy-capture` must be set
+by the snapshot or in `extra-deps`, and dependency constraints ensure that the
+versions match.  Package `accelerate-tracy-capture-stack` automatically uses
+that version, with no need to checkout any particular commit.
+
+Run the program as follows:
+
+```
+stack run tracy-capture -- [OPTIONS]
+```
 
 ## Development
 

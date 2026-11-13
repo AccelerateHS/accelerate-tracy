@@ -1,4 +1,6 @@
 packages:
   accelerate-tracy-lib
   accelerate-tracy-capture
+  accelerate-tracy-capture-stack
   accelerate-tracy-profiler
+  accelerate-tracy-profiler-stack

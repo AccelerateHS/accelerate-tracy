@@ -1,9 +1,11 @@
-resolver: nightly-2026-10-12
+snapshot: nightly-2026-10-12
 
 packages:
   - accelerate-tracy-lib
   - accelerate-tracy-capture
+  - accelerate-tracy-capture-stack
   - accelerate-tracy-profiler
+  - accelerate-tracy-profiler-stack
 
 #flags:
   #accelerate-tracy-lib:

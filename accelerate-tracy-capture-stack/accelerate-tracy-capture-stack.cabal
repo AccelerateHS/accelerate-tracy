@@ -1,0 +1,54 @@
+cabal-version:      3.0
+name:               accelerate-tracy-capture-stack
+version:            0.1.0.0
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             The Accelerate Team
+maintainer:         Trevor L. McDonell <trevor.mcdonell@gmail.com>
+category:           Accelerate
+build-type:         Simple
+synopsis:           Tracy tracy-capture program (Stack helper package)
+
+description:
+  This package provides an easy way to install the @tracy-capture@ program of
+  [Tracy profiler](https://github.com/wolfpld/tracy#tracy-profiler) for
+  profiling [Accelerate](https://www.acceleratehs.org/) kernels when using
+  Stack.
+
+  For details, please see the @accelerate-tracy@ README on GitHub at
+  <https://github.com/AccelerateHS/accelerate-tracy#readme>.
+
+tested-with:
+  GHC ==9.4.8
+   || ==9.6.7
+   || ==9.8.4
+   || ==9.10.3
+   || ==9.12.2
+   || ==9.14.1
+
+extra-doc-files:
+  CHANGELOG.md
+  README.md
+
+executable tracy-capture
+  hs-source-dirs:   app
+  main-is:          Main.hs
+
+  build-depends:
+    , accelerate-tracy-capture >= 0.1      && < 0.2
+    , base                     >= 4.17.2.1 && < 4.23
+
+  default-language: GHC2021
+
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wno-unticked-promoted-constructors
+    -Wredundant-constraints
+    -Wunused-packages
+
+  -- TODO build Tracy executables on Windows
+  -- <https://github.com/AccelerateHS/accelerate-tracy/issues/2>
+  if os(windows)
+    buildable:      False

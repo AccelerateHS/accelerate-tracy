@@ -7,5 +7,11 @@ cradle:
     - path: "accelerate-tracy-capture/app"
       component: "accelerate-tracy-capture:exe:tracy-capture"
 
+    - path: "accelerate-tracy-capture-stack/app"
+      component: "accelerate-tracy-capture-stack:exe:tracy-capture"
+
     - path: "accelerate-tracy-profiler/app"
       component: "accelerate-tracy-profiler:exe:tracy-profiler"
+
+    - path: "accelerate-tracy-profiler-stack/app"
+      component: "accelerate-tracy-profiler-stack:exe:tracy-profiler"
