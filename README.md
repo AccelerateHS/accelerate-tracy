@@ -115,6 +115,10 @@ the committed `stack.yaml` does not work.  Use the `--stack-yaml` option to
 specify a different configuration file.  Alternatively, copy a versioned
 configuration file, replacing `stack.yaml`, but be careful to not commit it.
 
+Note that `stack run` has problems in this project because the Stack helper
+packages have executables with the same name as the Tracy executable packages.
+Test these from the context of a different project.
+
 ### HIE/HLS
 
 If you would like to use HIE/HLS with Cabal, create a symbolic link to
