@@ -52,6 +52,9 @@ Configure the following in your `cabal.project.local`:
 ```
 extra-packages:
   accelerate-tracy-profiler
+
+package accelerate-tracy-lib
+  flags: +tracy
 ```
 
 The version is determined automatically by the Cabal solver based on the
