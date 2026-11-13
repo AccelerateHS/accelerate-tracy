@@ -20,12 +20,6 @@ import Distribution.Verbosity qualified as Verbosity
 import System.Directory qualified as Dir
 import System.FilePath ((<.>), (</>))
 
-#if MIN_VERSION_Cabal(3,14,0)
--- Any changes to path logic must be tested across the range of supported Cabal
--- versions.
-import Distribution.Utils.Path qualified as Path
-#endif
-
 {-------------------------------------------------------------------------------
   Configuration
 -------------------------------------------------------------------------------}
