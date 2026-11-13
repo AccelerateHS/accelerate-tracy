@@ -8,7 +8,7 @@
 -- Portability : non-portable (GHC extensions)
 module Main (main) where
 
-import Data.Array.Accelerate.Tracy.Capture qualified
+import qualified Data.Array.Accelerate.Tracy.Capture
 
 main :: IO ()
 main = Data.Array.Accelerate.Tracy.Capture.defaultMain
